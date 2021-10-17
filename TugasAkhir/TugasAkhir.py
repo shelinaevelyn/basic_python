@@ -2,90 +2,90 @@ import smtplib
 import getpass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+from email.mime.base import MIMEBase 
+from email import encoders 
 
-while True: 
-    print ("-----------------------------")
-    print("Selamat datang!")
-    print("---Menu---")
-    print("1. Daftar Email")
-    print("2. Tambah Email")
-    print("3. Mengirim Email")
-    print("4. Keluar")
-    print("------------------------------")
-    menu = input("Piih Menu: ")
-    print()
+print("Selamat datang, di program E-mail!")
+sender_address = input("Masukkan Email:")
+sender_pass = sender_pass = getpass.getpass("Masukkan Password:")
 
-    if menu == '2':
-        print("Masukkan Email Baru ")
-        print ("-----------------------------")
-        Email = input(str("Email:  "))
-        with open('contact.txt', 'a') as f:
-               f.read(Email)
-               f.read('\n')
-        print()
-        print("Email berhasil ditambahkan!")
+with open("D:\\Python\\basic_python9\\TugasAkhir\\contact.txt", 'r') as file:
+    ffile = file.read()
+listreceiver = ffile.split("\n")
 
-    elif menu == '3':
-    #Login e-mail
-        print("Silahkan Login Terlebih Dahulu ")
-        gmail_user = input(str("Masukkan akun gmail: "))
-        gmail_app_password = gmail_app_password = getpass.getpass("Masukkan Password:")
+loop = True
+while loop:
+   print ('-------------------------')
+   print ("Apakah ingin mengirim email dengan file?")
+   print ("0. Tidak\n1. Ya")
+   masuk = input ("Masukkan kode input:")
+   print ('-------------------------')
 
-    #Sumber : https://www.pythonindo.com/cara-mengirim-email-menggunakan-python/
-        pesan = MIMEMultipart()
-        pesan['From'] = gmail_user
-        pesan['Subject'] = input("Masukkan Subjek E-mail: ")
-        body = input("Masukkan Isi E-mail: ")
+   if masuk == '1': 
+      print ("\nMasukkan Subject dan Isi Email")
+      inputsubject= input("Subject:")
+      inputisi = input("Isi:")
+      inputfile = input ("Input file path: ")
 
-    #Masukkan lampiran
-        filename = input("Masukkan nama File beserta formatnya: ")
-        path = input("Masukkan Path File: ")
-        attachment = open(path, "rb") 
-        part = MIMEBase('application', 'octet-stream')
-        part.set_payload((attachment).read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-        pesan.attach(part)
+#referensi: https://www.fireblazeaischool.in/blogs/sending-multiple-emails-using-python/
+      for i in range(len(listreceiver)): 
+         x = listreceiver[i]
+         reciver_mail = x   
+         print(reciver_mail)
+         
+         message = MIMEMultipart()
+         message['From'] = sender_address
+         message['To'] =  reciver_mail 
+         message['Subject'] =  inputsubject    
+         mail_content = inputisi
+         
+         message.attach(MIMEText(mail_content, 'plain'))
+         filename = inputfile
 
-    #read penerima
-        with open('contact.txt', 'r') as f:
-	        penerima = f.readlines()
-       
-    #Sumber: https://stackoverflow.com/questions/10147455/how-to-send-an-email-with-gmail-as-provider-using-python
-    #bila tidak bisa
-        for y in range(len(penerima)):
-            receiver = f"{penerima[y]}"
-            pesan['To'] = receiver
-            pesan.attach(MIMEText(body, 'plain'))
-           
-            try:          
-                server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-                server.ehlo()
-                server.login(gmail_user, gmail_app_password)
-                text = pesan.as_string()
-                server.sendmail(gmail_user, receiver, text)
-                server.quit()
-
-                print('Email sent!')
-            except Exception as exception:
-                print("Error: %s!\n\n" % exception)
-
-    #daftar e-mail
-    elif menu == '1':
-        print("Daftar Email ")
-        print ("-----------------------------")
-        with open('contact.txt', 'r') as f:
-            Daftar = f.read()
-            print(Daftar)
+         with open(filename, "rb") as attachment:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
             
-    #keluar program
-    elif menu == '4':
-        print ("-----------------------------")
-        print("Program berakhir, TERIMA KASIH!")
-        break
+         encoders.encode_base64(part) 
+         part.add_header('Content-Disposition', "attachment; filename= %s" % filename) 
 
-    else : 
-        print ("-----------------------------")
-        print("Menu tidak tersedia")
+         message.attach(part)
+         s = smtplib.SMTP('smtp.gmail.com', 587) 
+         s.starttls() 
+         s.login(sender_address, sender_pass) 
+         text = message.as_string()
+         s.sendmail(sender_address, reciver_mail, text) 
+         s.quit() 
+         
+         print('E-Mail terkirim')
+      loop = False
+   
+   elif masuk == '0':
+      print ("\nMasukkan Subject dan Isi Email")
+      inputsubject= input("Subject:")
+      inputisi = input("Isi:")
+
+      for i in range(len(listreceiver)): 
+         x = listreceiver[i]
+         reciver_mail = x   
+         print(reciver_mail)
+         
+         message = MIMEMultipart()
+         message['From'] = sender_address
+         message['To'] =  reciver_mail 
+         
+         message['Subject'] =  inputsubject    
+         mail_content = inputisi
+
+         s = smtplib.SMTP('smtp.gmail.com', 587) 
+         s.starttls() 
+         s.login(sender_address, sender_pass) 
+         text = message.as_string()
+         s.sendmail(sender_address, reciver_mail, text) 
+         s.quit() 
+
+         print('E-mail Terkirim')
+      loop = False
+
+   else: 
+      print("Menu tidak tersedia") 
