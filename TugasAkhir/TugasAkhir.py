@@ -8,7 +8,6 @@ from email import encoders
 while True: 
     print ("-----------------------------")
     print("Selamat datang!")
-    print()
     print("---Menu---")
     print("1. Daftar Email")
     print("2. Tambah Email")
@@ -23,8 +22,8 @@ while True:
         print ("-----------------------------")
         Email = input(str("Email:  "))
         with open('contact.txt', 'a') as f:
-               f.append(Email)
-               f.append('\n')
+               f.read(Email)
+               f.read('\n')
         print()
         print("Email berhasil ditambahkan!")
 
@@ -35,9 +34,9 @@ while True:
         gmail_app_password = gmail_app_password = getpass.getpass("Masukkan Password:")
 
     #Sumber : https://www.pythonindo.com/cara-mengirim-email-menggunakan-python/
-        msg = MIMEMultipart()
-        msg['From'] = gmail_user
-        msg['Subject'] = input("Masukkan Subjek E-mail: ")
+        pesan = MIMEMultipart()
+        pesan['From'] = gmail_user
+        pesan['Subject'] = input("Masukkan Subjek E-mail: ")
         body = input("Masukkan Isi E-mail: ")
 
     #Masukkan lampiran
@@ -48,7 +47,7 @@ while True:
         part.set_payload((attachment).read())
         encoders.encode_base64(part)
         part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-        msg.attach(part)
+        pesan.attach(part)
 
     #read penerima
         with open('contact.txt', 'r') as f:
@@ -58,14 +57,14 @@ while True:
     #bila tidak bisa
         for y in range(len(penerima)):
             receiver = f"{penerima[y]}"
-            msg['To'] = receiver
-            msg.attach(MIMEText(body, 'plain'))
+            pesan['To'] = receiver
+            pesan.attach(MIMEText(body, 'plain'))
            
             try:          
                 server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
                 server.ehlo()
                 server.login(gmail_user, gmail_app_password)
-                text = msg.as_string()
+                text = pesan.as_string()
                 server.sendmail(gmail_user, receiver, text)
                 server.quit()
 
